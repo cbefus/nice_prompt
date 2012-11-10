@@ -1,8 +1,34 @@
+#  _   _ _           ______                          _
+# | \ | (_)          | ___ \                        | |
+# |  \| |_  ___ ___  | |_/ / __ ___  _ __ ___  _ __ | |_
+# | . ` | |/ __/ _ \ |  __/ '__/ _ \| '_ ` _ \| '_ \| __|
+# | |\  | | (_|  __/ | |  | | | (_) | | | | | | |_) | |_
+# \_| \_/_|\___\___| \_|  |_|  \___/|_| |_| |_| .__/ \__|
+#                                             | |
+# By Chad R. Befus                            |_|
+
 
 # These are all the options available to your bash prompt parts.
-# Do not mess with the order of this array asi it is key to generating the
-# ascii codes below.
+# Do not mess with the order of this array as it is key to generating the
+# ascii codes below.  Note: though these give the correct ascii command
+# codes, some options, like blink, will not have any effect on parts of
+# a bash prompt.
 attribute_array=("none" "bold" "underscore" "blink" "reverse" "concealed")
+
+# These are all of the color options available for your bash prompt parts.
+# This includes foreground and background. Do not mess with the order of this
+# array as it is key to generating the ascii codes below.
+color_array=("black" "red" "green" "yellow" "blue" "purple" "cyan" "white")
+
+
+# Function: _get_attribute_array_index
+# @parameter: find_string <string> - the name of the attribute from the array
+# @echos: <int> - the array index of the string
+# @example usage:
+#       foo=$(_get_attribute_array_index "bold")
+#       echo $foo # echos 1
+# TODO: Make this function take an array second parameter and work for both
+#       attributes and colors.
 function _get_attribute_array_index() {
     find_string=$1
     for array_index in ${!attribute_array[*]}
@@ -18,10 +44,14 @@ function _get_attribute_array_index() {
     return
 }
 
-# These are all of the color options available for your bash prompt parts.
-# This includes foreground and background. Do not mess with the order of this
-# array as it is key to generating the ascii codes below.
-color_array=("black" "red" "green" "yellow" "blue" "purple" "cyan" "white")
+# Function: _get_color_array_index
+# @parameter: find_string <string> - the name of the color from the array
+# @echos: <int> - the array index of the string
+# @example usage:
+#       foo=$(_get_color_array_index "red")
+#       echo $foo # echos 1
+# TODO: Make this function take an array second parameter and work for both
+#       attributes and colors.
 function _get_color_array_index() {
     find_string=$1
     for array_index in ${!color_array[*]}
@@ -37,26 +67,37 @@ function _get_color_array_index() {
     return
 }
 
-foreground_color_ascii_code_start="30"
-background_color_ascii_code_start="40"
-light_color_ascii_modifier="60"
-control_start="\["
-control_end="\]"
-ascii_escape_prefix="\033"
-color_postfix="m"
+FOREGROUND_COLOR_ASCII_CODE_START="30"
+BACKGROUND_COLOR_ASCII_CODE_START="40"
+LIGHT_COLOR_ASCII_MODIFIER="60"
+CONTROL_START="\["
+CONTROL_END="\]"
+ASCII_ESCAPE_PREFIX="\033"
+COLOR_POSTFIX="m"
+
+# Function: _set_color()
+# @parameter: attribute_string <string> - the name of the attribute from the array or "none"
+# @parameter: foreground_string <string> - the foreground color from the array
+# @parameter: foreground_light_string <string> - "light" or "normal"
+# @parameter: background_string <string> - "the background color from the array"
+# @parameter: background_light_string <string> - "light" or "normal"
+# @echos: <string> - the ascii code for the prompt color
+# @example usage:
+#       foo=$(_set_color "bold" "black" "light" "red" "normal")
+#       echo $foo # echos \[\033[1;90;41m\]
 function _set_color() {
     attribute_string=$1
     foreground_string=$2
     foreground_light_string=$3
     background_string=$4
     background_light_string=$5
-    ascii_attribute_code=$(_get_attribute_array_index $attribute_string $attribute_array)
+    ascii_attribute_code=$(_get_attribute_array_index $attribute_string)
 
-    ascii_foreground_code=$(_get_color_array_index $foreground_string $color_array)
-    ascii_foreground_code=$((ascii_foreground_code+foreground_color_ascii_code_start))
+    ascii_foreground_code=$(_get_color_array_index $foreground_string)
+    ascii_foreground_code=$((ascii_foreground_code+FOREGROUND_COLOR_ASCII_CODE_START))
     if [ $foreground_light_string == "light" ]
     then
-        ascii_foreground_code=$((ascii_foreground_code+light_color_ascii_modifier))
+        ascii_foreground_code=$((ascii_foreground_code+LIGHT_COLOR_ASCII_MODIFIER))
     fi
     ascii_foreground_code=';'$ascii_foreground_code
 
@@ -65,26 +106,23 @@ function _set_color() {
         ascii_background_code=""
     else
         ascii_background_code=$(_get_color_array_index $background_string $color_array)
-        ascii_background_code=$((ascii_background_code+background_color_ascii_code_start))
+        ascii_background_code=$((ascii_background_code+BACKGROUND_COLOR_ASCII_CODE_START))
         if [ $background_light_string == "light" ]
         then
-            ascii_background_code=$((ascii_background_code+light_color_ascii_modifier))
+            ascii_background_code=$((ascii_background_code+LIGHT_COLOR_ASCII_MODIFIER))
         fi
         ascii_background_code=';'$ascii_background_code
     fi
 
-    ascii_prefix=$control_start$ascii_escape_prefix
+    ascii_prefix=$CONTROL_START$ASCII_ESCAPE_PREFIX
     ascii_sequence='['$ascii_attribute_code$ascii_foreground_code$ascii_background_code
-    ascii_postfix=$color_postfix$control_end
+    ascii_postfix=$COLOR_POSTFIX$CONTROL_END
     echo $ascii_prefix$ascii_sequence$ascii_postfix
     return
 }
 
 # Reset
 color_reset='\[\033[0;0m\]'
-
-# foo=$(_set_color "none" "red" "normal" "black" "normal")
-# echo $foo"bar"$color_reset
 
 ##############################################################################
 # PROMPT ELEMENTS
@@ -133,6 +171,8 @@ git_clean_color=$(_set_color "none" "black" "normal" "green" "normal")
 git_changed_color=$(_set_color "none" "black" "normal" "red" "normal")
 git_untracked_color=$(_set_color "none" "black" "normal" "yellow" "normal")
 
+# Function: _git_prompt
+# echos: The git branch name (or "No Repo") with appropriate colors
 function _git_prompt() {
     local git_status="`git status -unormal 2>&1`"
     if ! [[ "$git_status" =~ Not\ a\ git\ repo ]]
@@ -161,6 +201,9 @@ function _git_prompt() {
 # virtual environment colors
 virtualenv_color=$(_set_color "bold" "red" "normal" "none" "normal")
 
+# Function: _virtualenv_prompt
+# Precondition: $VIRTUAL_ENV must be set
+# Echos: The virtual environment name with appropriate coloring or empty
 function _virtualenv_prompt() {
     if [[ $VIRTUAL_ENV != "" ]]
     then
@@ -171,13 +214,20 @@ function _virtualenv_prompt() {
 }
 
 # some usefull constants
-back_slash="\\"
-new_line="\n"
+BACK_SLASH="\\"
+NEW_LINE="\n"
 
+##############################################################################
+# THE PROMPT
+##############################################################################
+
+# Function: _prompt_command
+# Echos: The combination of prompt parts chosen in their respective colors in
+#       the order and setup (aka with the syntax) defined in this function.
 function _prompt_command() {
     git_part=$(_git_prompt)
     virtualenv_part=$(_virtualenv_prompt)
-    PS1=$date_part' at '$time_part' '$username_part'@'$hostname_part' in '$cwd_part' '$new_line' ['$git_part'] '$virtualenv_part' '$separator_part' '$input_part
+    PS1=$date_part' at '$time_part' '$username_part'@'$hostname_part' in '$cwd_part' '$NEW_LINE' ['$git_part'] '$virtualenv_part' '$separator_part' '$input_part
 }
 
 PROMPT_COMMAND=_prompt_command
