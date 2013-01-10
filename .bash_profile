@@ -198,6 +198,36 @@ function _git_prompt() {
     fi
 }
 
+#vagrant colors
+vagrant_halted_color=$(_set_color "none" "black" "normal" "green" "normal")
+vagrant_destroyed_color=$(_set_color "none" "black" "normal" "blue" "normal")
+vagrant_running_color=$(_set_color "none" "black" "normal" "red" "normal")
+vagrant_suspended_color=$(_set_color "none" "black" "normal" "yellow" "normal")
+
+#Function: _vagrant_prompt
+# echos: The status of the local vagrant (or "None") with appropriate colors
+function _vagrant_prompt() {
+    local vagrant_status="`vagrant status 2>&1`"
+    if ! [[ "$vagrant_status" =~ A\ Vagrant\ environment\ is\ required ]]
+    then
+        if [[ "$vagrant_status" =~ poweroff ]]
+        then
+            echo -n " {"$vagrant_halted_color"Halted"$color_reset"}"
+        elif [[ "$vagrant_status" =~ running ]]
+        then
+            echo -n " {"$vagrant_running_color"Running"$color_reset"}"
+        elif [[ "$vagrant_status" =~ not\ created ]]
+        then
+            echo -n " {"$vagrant_destroyed_color"Destroyed"$color_reset"}"
+        else
+            echo -n " {"$vagrant_suspended_color"Suspended"$color_reset"}"
+        fi
+    else
+        echo -n ""
+    fi
+}
+
+
 # virtual environment colors
 virtualenv_color=$(_set_color "bold" "red" "normal" "none" "normal")
 
@@ -207,7 +237,7 @@ virtualenv_color=$(_set_color "bold" "red" "normal" "none" "normal")
 function _virtualenv_prompt() {
     if [[ $VIRTUAL_ENV != "" ]]
     then
-        echo $virtualenv_color"(${VIRTUAL_ENV##*/})"
+        echo $virtualenv_color" (${VIRTUAL_ENV##*/})"
     else
         echo ""
     fi
@@ -227,7 +257,8 @@ NEW_LINE="\n"
 function _prompt_command() {
     git_part=$(_git_prompt)
     virtualenv_part=$(_virtualenv_prompt)
-    PS1=$date_part' at '$time_part' '$username_part'@'$hostname_part' in '$cwd_part' '$NEW_LINE' ['$git_part'] '$virtualenv_part' '$separator_part' '$input_part
+    vagrant_part=$(_vagrant_prompt)
+    PS1=$date_part' at '$time_part' '$username_part'@'$hostname_part' in '$cwd_part' '$NEW_LINE' ['$git_part']'$vagrant_part$virtualenv_part' '$separator_part' '$input_part
 }
 
 PROMPT_COMMAND=_prompt_command
