@@ -63,8 +63,8 @@ Out of the Box Prompt and Format
 
 By default the prompt is:
 
-<Date> at <Time> <User>@<Host> in <path> \n
-[<git status>] {<vagrant status>} (<virtual environment>) $
+\n\<Date\> at \<Time\> \<User\>@\<Host\> in \<path\> \n
+[\<git status\>] {\<vagrant status\>} (\<virtual environment\>) $
 
 The vagrant status and virtual environment only show up if they exist, git shows None if not there.
 
