@@ -1,4 +1,3 @@
-
 NICE PROMPT
 ===========
 
@@ -57,6 +56,17 @@ Find the function _prompt_command and look for the PS1= line:
     PS1=$date_part' at '$time_part' '$username_part'@'$hostname_part' in '$cwd_part' '$NEW_LINE' ['$git_part'] '$virtualenv_part' '$separator_part' '$input_part
 
 This is just a giant string, rearrange the parts as you wish, add parts, remove parts, add syntax, ect.
+
+
+Out of the Box Prompt and Format
+================================
+
+By default the prompt is:
+
+<Date> at <Time> <User>@<Host> in <path> \n
+[<git status>] {<vagrant status>} (<virtual environment>) $
+
+The vagrant status and virtual environment only show up if they exist, git shows None if not there.
 
 
 Enjoy.
