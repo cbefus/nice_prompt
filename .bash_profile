@@ -258,7 +258,7 @@ function _prompt_command() {
     git_part=$(_git_prompt)
     virtualenv_part=$(_virtualenv_prompt)
     vagrant_part=$(_vagrant_prompt)
-    PS1=$date_part' at '$time_part' '$username_part'@'$hostname_part' in '$cwd_part' '$NEW_LINE' ['$git_part']'$vagrant_part$virtualenv_part' '$separator_part' '$input_part
+    PS1=$NEW_LINE$date_part' at '$time_part' '$username_part'@'$hostname_part' in '$cwd_part' '$NEW_LINE' ['$git_part']'$vagrant_part$virtualenv_part' '$separator_part' '$input_part
 }
 
 PROMPT_COMMAND=_prompt_command
