@@ -1,6 +1,6 @@
 NICE PROMPT
 ===========
-
+```
   _   _ _           ______                          _
  | \ | (_)          | ___ \                        | |
  |  \| |_  ___ ___  | |_/ / __ ___  _ __ ___  _ __ | |_
@@ -9,6 +9,7 @@ NICE PROMPT
  \_| \_/_|\___\___| \_|  |_|  \___/|_| |_| |_| .__/ \__|
                                              | |
  By Chad R. Befus                            |_|
+ ```
  ================
 
 A simple to use, fully functional, (includes date, time, user, host, cwd, git status, and virtual env) .bash_profile for your bash prompt.
@@ -64,9 +65,9 @@ Out of the Box Prompt and Format
 By default the prompt is:
 
 \n\<Date\> at \<Time\> \<User\>@\<Host\> in \<path\> \n
-[\<git status\>] {\<vagrant status\>} (\<virtual environment\>) $
+[\<git status\>] (\<virtual environment\>) $
 
-The vagrant status and virtual environment only show up if they exist, git shows None if not there.
+The  virtual environment only show up if it exists, git shows None if not there.
 
 
 Enjoy.
