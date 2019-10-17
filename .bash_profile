@@ -130,11 +130,11 @@ color_reset='\[\033[0;0m\]'
 
 # Some elements you might want in your prompt
 # date
-date_color=$(_set_color "none" "black" "light" "none" "normal")
+date_color=$(_set_color "none" "white" "normal" "none" "normal")
 date_part=$date_color"\d"$color_reset
 
 # time
-time_color=$(_set_color "blink" "white" "normal" "none" "normal")
+time_color=$(_set_color "blink" "black" "normal" "white" "normal")
 time_12h_long="\T"
 time_12h_short="\@"
 time_24h_long="\t"
@@ -175,7 +175,7 @@ git_untracked_color=$(_set_color "none" "black" "normal" "yellow" "normal")
 # echos: The git branch name (or "No Repo") with appropriate colors
 function _git_prompt() {
     local git_status="`git status -unormal 2>&1`"
-    if ! [[ "$git_status" =~ Not\ a\ git\ repo ]]
+    if ! [[ "$git_status" =~ not\ a\ git\ repo ]]
     then
         if [[ "$git_status" =~ On\ branch\ ([^[:space:]]+) ]]
         then
@@ -197,36 +197,6 @@ function _git_prompt() {
         echo -n $git_norepo_color"No Repo"$color_reset
     fi
 }
-
-#vagrant colors
-vagrant_halted_color=$(_set_color "none" "black" "normal" "green" "normal")
-vagrant_destroyed_color=$(_set_color "none" "black" "normal" "blue" "normal")
-vagrant_running_color=$(_set_color "none" "black" "normal" "red" "normal")
-vagrant_suspended_color=$(_set_color "none" "black" "normal" "yellow" "normal")
-
-#Function: _vagrant_prompt
-# echos: The status of the local vagrant (or "None") with appropriate colors
-function _vagrant_prompt() {
-    local vagrant_status="`vagrant status 2>&1`"
-    if ! [[ "$vagrant_status" =~ A\ Vagrant\ environment\ is\ required ]]
-    then
-        if [[ "$vagrant_status" =~ poweroff ]]
-        then
-            echo -n " {"$vagrant_halted_color"Halted"$color_reset"}"
-        elif [[ "$vagrant_status" =~ running ]]
-        then
-            echo -n " {"$vagrant_running_color"Running"$color_reset"}"
-        elif [[ "$vagrant_status" =~ not\ created ]]
-        then
-            echo -n " {"$vagrant_destroyed_color"Destroyed"$color_reset"}"
-        else
-            echo -n " {"$vagrant_suspended_color"Suspended"$color_reset"}"
-        fi
-    else
-        echo -n ""
-    fi
-}
-
 
 # virtual environment colors
 virtualenv_color=$(_set_color "bold" "red" "normal" "none" "normal")
@@ -257,9 +227,7 @@ NEW_LINE="\n"
 function _prompt_command() {
     git_part=$(_git_prompt)
     virtualenv_part=$(_virtualenv_prompt)
-    vagrant_part=$(_vagrant_prompt)
-    PS1=$NEW_LINE$date_part' at '$time_part' '$username_part'@'$hostname_part' in '$cwd_part' '$NEW_LINE' ['$git_part']'$vagrant_part$virtualenv_part' '$separator_part' '$input_part
+    PS1=$NEW_LINE$date_part' at '$time_part' '$username_part'@'$hostname_part' in '$cwd_part' '$NEW_LINE' ['$git_part']'$virtualenv_part' '$separator_part' '$input_part
 }
 
 PROMPT_COMMAND=_prompt_command
-
